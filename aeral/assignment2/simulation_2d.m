@@ -118,7 +118,7 @@ for iter = 1:max_iter
     subplot(3,3,9)
     plot(ttraj(1:iter*nstep), 180/pi*xtraj(1:iter*nstep,3));
     grid on;
-    xlabel('t [s]'); ylabel('\phi [�]');
+    xlabel('t [s]'); ylabel('\phi [rad]');
 %
 %     figure(2);
 %     subplot(3,1,3)
