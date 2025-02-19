@@ -1,6 +1,6 @@
 function route = DijkstraTorus (input_map, start_coords, dest_coords)
 % Run Dijkstra's algorithm on a grid.
-% Inputs : 
+% Inputs :
 %   input_map : a logical array where the freespace cells are false or 0 and
 %      the obstacles are true or 1
 %   start_coords and dest_coords : Coordinates of the start and end cell
@@ -27,7 +27,10 @@ cmap = [1 1 1; ...
 
 colormap(cmap);
 
+label = true;
 
+input_map(:, 181) = [];
+input_map(181, :) = [];
 [nrows, ncols] = size(input_map);
 
 % map - a table that keeps track of the state of each grid cell
@@ -53,37 +56,56 @@ distances(start_node) = 0;
 
 % Main Loop
 while true
-    
+
     % Draw current map
     map(start_node) = 5;
     map(dest_node) = 6;
-    
+
     image(1.5, 1.5, map);
     grid on;
     axis image;
     drawnow;
-    
+
     % Find the node with the minimum distance
     [min_dist, current] = min(distances(:));
-    
+
     if ((current == dest_node) || isinf(min_dist))
         break;
-    end;
-    
+    end
+
     % Update map
     map(current) = 3;         % mark current node as visited
     distances(current) = Inf; % remove this node from further consideration
-    
+
     % Compute row, column coordinates of current node
     [i, j] = ind2sub(size(distances), current);
-    
+
     % Visit each neighbor of the current node and update the map, distances
     % and parent tables appropriately.
-   
-    %%% All of your code should be between the two lines of stars. 
+
+    %%% All of your code should be between the two lines of stars.
     % *******************************************************************
-    
-    
+
+    % Define possible movements (up, right, down, left)
+    di = [-1, 0, 1, 0];
+    dj = [0, 1, 0, -1];
+
+    % Check all four neighbors
+    for iteration = 1:4
+        % Calculate neighbor indices with torus topology
+        new_i = mod(i + di(iteration) - 1, nrows) + 1;
+        new_j = mod(j + dj(iteration) - 1, ncols) + 1;
+
+        % Calculate new distance
+        new_dist = min_dist + 1;
+
+        % Convert to linear index
+        neighbor = sub2ind(size(map), new_i, new_j);
+
+        % Update neighbor
+        update(new_i, new_j, new_dist, current);
+    end
+
     % *******************************************************************
 end
 
@@ -91,10 +113,11 @@ if (isinf(distances(dest_node)))
     route = [];
 else
     route = [dest_node];
-    
+
     while (parent(route(1)) ~= 0)
         route = [parent(route(1)), route];
     end
+    drawMap(label);
 end
 
     function update (i,j,d,p)
@@ -105,4 +128,14 @@ end
         end
     end
 
+    function drawMap(label)
+        if label==true
+        for k = 2:length(route) - 1
+            map(route(k)) = 7;
+        end
+        image(1.5, 1.5, map);
+        grid on;
+        axis image;
+        end
+        end
 end
