@@ -31,9 +31,9 @@ x = RandomSample();
 % of a point in configuration space.
 samples = repmat(x(:), 1, nsamples);
 
-% edges - an array with 2 rows each column has two integer entries
+% edges - an array with 2 columns. Each row has two integer entries
 % (i, j) which encodes the fact that sample i and sample j are connected
-% by an edge. For each 
+% by an edge.
 edges = zeros(nsamples*k, 2);
 edge_lengths = zeros(nsamples*k, 1);
 
@@ -47,9 +47,9 @@ for i = 2:nsamples
     x = RandomSample();
 
     samples(:,i) = x(:);
-    
+
     % Find the nearest neighbors
-    
+
     % Here we assume that the Dist function can compute the
     % distance to multiple samples corresponding to the columns of
     % the second argument
@@ -57,16 +57,29 @@ for i = 2:nsamples
     % distance between the new sample and each of the samples that has been
     % generated so far in the program.
     distances = Dist(x, samples(:,1:(i-1)));
-    
+
     %%% YOUR CODE HERE
     %
     % Find the closest k samples, use the LocalPlanner function to see if
     % you can forge an edge to any of these samples and update the edges,
     % edge_lengths and nedges variables accordingly.
     %
-    
+
     fprintf (1, 'nsamples = %d, nedges = %d\n', i, nedges);
-   
+
+    % Sort distances to find k nearest neighbors
+    [sorted_distances, sorted_indices] = sort(distances);
+    k_nearest = sorted_indices(1:min(k,length(sorted_indices)));
+
+    % Check each neighbor for valid path
+    for j = 1:length(k_nearest)
+        neighbor_idx = k_nearest(j);
+        if LocalPlanner(x, samples(:,neighbor_idx))
+            nedges = nedges + 1;
+            edges(nedges,:) = [i, neighbor_idx];
+            edge_lengths(nedges) = sorted_distances(j);
+        end
+    end
 end
 
 roadmap.samples = samples;
