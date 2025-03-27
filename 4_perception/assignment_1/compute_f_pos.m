@@ -20,5 +20,25 @@ function [ f, pos ] = compute_f_pos( d1_ref, d2_ref, H1, H2, ratio, f_ref )
 
 % YOUR CODE HERE
 
-end
+% Using the projection equation: u = f * X/Z
+% For object A: h1 = f * H1/(d1_ref - pos)
+% For object B: h2 = f * H2/(d2_ref - pos)
+% We want: ratio = h1/h2 = (f * H1/(d1_ref - pos))/(f * H2/(d2_ref - pos))
+% Therefore: ratio = (H1 * (d2_ref - pos))/(H2 * (d1_ref - pos))
 
+% Solve for pos:
+% ratio * H2 * (d1_ref - pos) = H1 * (d2_ref - pos)
+% ratio * H2 * d1_ref - ratio * H2 * pos = H1 * d2_ref - H1 * pos
+% H1 * pos - ratio * H2 * pos = H1 * d2_ref - ratio * H2 * d1_ref
+% pos * (H1 - ratio * H2) = H1 * d2_ref - ratio * H2 * d1_ref
+% pos = (H1 * d2_ref - ratio * H2 * d1_ref)/(H1 - ratio * H2)
+
+% Calculate the new camera position to achieve the desired ratio
+pos = (H1 * d2_ref - ratio * H2 * d1_ref) / (H1 - ratio * H2);
+
+% Calculate the new focal length to maintain object A's size
+% Using the equation: f_ref * H1 / d1_ref = f * H1 / (d1_ref - pos)
+% Therefore: f = f_ref * (d1_ref - pos) / d1_ref
+f = f_ref * (d1_ref - pos) / d1_ref;
+
+end

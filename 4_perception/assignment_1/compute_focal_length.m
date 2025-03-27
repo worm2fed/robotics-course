@@ -1,6 +1,6 @@
 function [ f ] = compute_focal_length( d_ref, f_ref, pos )
-%% Compute camera focal length with given camera position.  
-% 
+%% Compute camera focal length with given camera position.
+%
 % In this function, multiple camera positions will be given. The camera is
 % placed on z axis and thus only z axis for the camera position is given.
 % We'll need to compute corresponding focal length to achieve Dolly Zoom
@@ -16,5 +16,10 @@ function [ f ] = compute_focal_length( d_ref, f_ref, pos )
 
 % YOUR CODE HERE
 
-end
+% For Dolly Zoom effect, we need to maintain the same projection size
+% Using the equation: f_ref * X/d_ref = f_new * X/(d_ref - pos)
+% Therefore: f_new = f_ref * (d_ref - pos)/d_ref
 
+f = f_ref .* ((d_ref - pos) ./ d_ref);
+
+end
